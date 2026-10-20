@@ -19,17 +19,17 @@ favg = np.mean(f, axis=0)
 stdfset = np.std(f, axis=0)
 print("Standard deviation of frequency measurements:", stdfset)
 
-# Wave numbers and uncertainties
+# Wave numbers and uncertainties (measured in rad/cm, converted to rad/m)
 k = np.array([0.02882, 0.05764, 0.08647,
-              0.11529, 0.14411, 0.17293])
+              0.11529, 0.14411, 0.17293]) * 100
 
 err_k = np.array([
     1.16299e-4, 4.65195e-4, 0.00105,
     0.00186, 0.00291, 0.00419
-])
+]) * 100
 
-a = 15.5
-err_a = 0.1
+a = 0.155      # Spacing in metres
+err_a = 0.001
 
 # Linearized dispersion model
 def linearized_dispersion(x, slope):
@@ -68,9 +68,14 @@ popt_avg, pcov_avg = curve_fit(
     sigma=dyavg, absolute_sigma=True
 )
 
-print("Trial 1 fit:", popt1 , '+-', pcov1)
-print("Trial 2 fit:", popt2, '+-', pcov2)
-print("Average fit:", popt_avg, '+-', pcov_avg)
+# Standard errors of the fitted parameters
+perr1 = np.sqrt(np.diag(pcov1))
+perr2 = np.sqrt(np.diag(pcov2))
+perr_avg = np.sqrt(np.diag(pcov_avg))
+
+print("Trial 1 fit:", popt1, '+-', perr1)
+print("Trial 2 fit:", popt2, '+-', perr2)
+print("Average fit:", popt_avg, '+-', perr_avg)
 
 # Generate fitted curves
 k_fit = np.linspace(min(k), max(k), 500)
